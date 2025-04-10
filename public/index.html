@@ -19,11 +19,11 @@
 
     .container {
       background: rgba(255, 255, 255, 0.9);
-      padding: 3rem 3.5rem;
+      padding: 2rem 3rem;
       border-radius: 15px;
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
       text-align: center;
-      max-width: 450px;
+      max-width: 400px;
       width: 100%;
       animation: fadeIn 0.7s ease-in-out;
     }
@@ -66,6 +66,22 @@
       background-color: #a2133b;
     }
 
+    .popup {
+      display: none;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 25px;
+      background-color: #7b2cbf;
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      font-size: 1.2rem;
+      z-index: 9999;
+      animation: fadeInPopup 3s forwards;
+    }
+
     @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -76,15 +92,42 @@
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    @keyframes fadeInPopup {
+      0% { opacity: 0; top: 10px; }
+      100% { opacity: 1; top: 50px; }
+    }
+
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Enter Access Code</h1>
     <form method="POST" action="/submit">
-      <input type="text" name="code" placeholder="7-digit code or 'goobers'" required />
+      <input type="text" name="code" placeholder="Enter your 7-digit code" required />
       <button type="submit">Submit</button>
     </form>
   </div>
+
+  <!-- Popup message -->
+  <div class="popup">Invalid or used code</div>
+
+  <script>
+    // You can trigger this in your code when an error occurs (like a failed code submission)
+    function showPopup() {
+      const popup = document.querySelector(".popup");
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 3000); // Hide after 3 seconds
+    }
+
+    // Example of triggering the popup on invalid code submission
+    document.querySelector("form").addEventListener("submit", (e) => {
+      // Simulate code submission failure
+      e.preventDefault();
+      showPopup();
+    });
+  </script>
 </body>
 </html>
