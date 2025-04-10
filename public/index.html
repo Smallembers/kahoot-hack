@@ -15,7 +15,6 @@
       background-size: 400% 400%;
       animation: gradientAnimation 6s ease infinite;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overflow: hidden;
     }
 
     .container {
@@ -39,18 +38,28 @@
 
     input[type="text"] {
       width: 100%;
-      padding: 0.9rem 1.2rem;
+      padding: 1rem 1.4rem;
       font-size: 1.2rem;
-      border: 2px solid #c9184a;
-      border-radius: 12px;
+      border: none;
+      border-radius: 16px;
       outline: none;
       margin-bottom: 1.5rem;
-      transition: border-color 0.3s ease;
       box-sizing: border-box;
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.7);
     }
 
     input[type="text"]:focus {
-      border-color: #7b2cbf;
+      background: rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     button {
@@ -87,24 +96,17 @@
     #kahootFrame {
       display: none;
       position: fixed;
-      top: 100vh;
-      left: 0;
+      top: 0;
+      left: 100vw;
       width: 100vw;
       height: 100vh;
       border: none;
       z-index: 999;
-      animation: slideIn 0.7s ease forwards;
+      transition: left 1s ease;
     }
 
-    @keyframes slideIn {
-      0% {
-        top: 100vh;
-        opacity: 0;
-      }
-      100% {
-        top: 0;
-        opacity: 1;
-      }
+    #kahootFrame.show {
+      left: 0;
     }
 
     @keyframes gradientAnimation {
@@ -160,9 +162,9 @@
 
       if (response.redirected || code === "goobers") {
         document.getElementById("login").style.display = "none";
-        const frame = document.getElementById("kahootFrame");
-        frame.style.display = "block";
-        frame.style.animation = "slideIn 0.7s ease forwards";
+        const iframe = document.getElementById("kahootFrame");
+        iframe.classList.add("show"); // triggers the slide-in animation
+        iframe.style.display = "block";
       } else {
         showPopup();
       }
