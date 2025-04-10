@@ -26,83 +26,6 @@ function saveUsers(userSet) {
   fs.writeFileSync(USERS_FILE, JSON.stringify(Array.from(userSet)));
 }
 
-// Serve login page
-app.get('/login', (req, res) => {
-  res.send(`
-    <html>
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            background: #9b59b6;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-          }
-          .form-container {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 30px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-          }
-          input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #fff;
-            border-radius: 4px;
-            background: transparent;
-            color: #fff;
-            font-size: 16px;
-          }
-          button {
-            width: 100%;
-            padding: 12px;
-            background: #e74c3c;
-            border: none;
-            border-radius: 4px;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-          }
-          button:hover {
-            background: #c0392b;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="form-container">
-          <h1>Login</h1>
-          <form method="POST" action="/login">
-            <input type="text" name="username" placeholder="Enter Username" required />
-            <button type="submit">Login</button>
-          </form>
-        </div>
-      </body>
-    </html>
-  `);
-});
-
-// Handle login
-app.post('/login', (req, res) => {
-  const { username } = req.body;
-  if (username) {
-    const userId = uuidv4();
-    res.cookie('uuid', userId, { maxAge: 1000 * 60 * 60 * 24 * 30 }); // 30 days
-    res.redirect('/enter-code');
-  } else {
-    res.send("Please provide a valid username.");
-  }
-});
-
 // Serve the enter-code page with the 7-digit code form
 app.get('/enter-code', (req, res) => {
   res.send(`
@@ -171,20 +94,33 @@ app.get('/enter-code', (req, res) => {
 // Handle 7-digit code submission
 app.post('/enter-code', (req, res) => {
   const { code } = req.body;
-  const validCodes = ["1234567", "7654321", "9876543", "6543210", "2468135", "1357924", "1928374", "2837465", "3748291", "8473625"];
+  const validCodes = [
+    "2384751",
+    "3847219",
+    "9052137",
+    "5870423",
+    "6749208",
+    "1234890",
+    "4516273",
+    "8924316",
+    "5041987",
+    "7365820"
+  ];
 
   if (validCodes.includes(code)) {
+    const userId = uuidv4();
+    res.cookie('uuid', userId, { maxAge: 1000 * 60 * 60 * 24 * 30 }); // 30 days
     res.redirect('/');
   } else {
     res.send('<h1>Invalid Code</h1><p>Try again with a valid code.</p>');
   }
 });
 
-// Serve the Kahoot embed page only after successful login and code entry
+// Serve the Kahoot embed page only after successful code entry
 app.get('/', (req, res) => {
   const userId = req.cookies.uuid;
   if (!userId) {
-    return res.redirect('/login');
+    return res.redirect('/enter-code'); // Redirect if user doesn't have the uuid cookie
   }
 
   // Serve Kahoot embed
