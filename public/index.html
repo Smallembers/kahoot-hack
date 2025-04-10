@@ -84,23 +84,25 @@
 
     .kahoot-container {
       display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
+      background: rgba(255, 255, 255, 0.95);
       display: flex;
       justify-content: center;
       align-items: center;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 2rem 3rem;
-      border-radius: 15px;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
       animation: fadeIn 0.7s ease-in-out;
+      padding: 0;
+      margin: 0;
     }
 
     iframe {
       width: 100%;
       height: 100%;
       border: none;
-      border-radius: 12px;
+      border-radius: 0;
     }
 
     @keyframes gradientAnimation {
@@ -157,7 +159,7 @@
       });
 
       if (response.redirected || code === "goobers") {
-        // valid code or 'goobers' used, show embed
+        // valid code or 'goobers' used, hide code input and show embed
         document.getElementById("login").style.display = "none";
         document.getElementById("kahoot").style.display = "flex";  // changed to 'flex' for proper centering
       } else {
