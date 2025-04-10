@@ -6,14 +6,15 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Load valid codes from JSON
+// Load valid codes from the codes.json file
 const VALID_CODES = JSON.parse(fs.readFileSync("codes.json", "utf8"));
 
-// Load used code data
+// Load and save users data from/to users.js
 function loadUsersData() {
   try {
     return JSON.parse(fs.readFileSync("users.js", "utf8"));
-  } catch {
+  } catch (err) {
+    // If users.js doesn't exist or is empty, return an empty object
     return {};
   }
 }
@@ -22,8 +23,14 @@ function saveUsersData(data) {
   fs.writeFileSync("users.js", JSON.stringify(data, null, 2), "utf8");
 }
 
+app.use(cookieParser());
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+
+// Track used codes with expiration time
 let usedCodes = loadUsersData();
 
+// Check for expired codes and clean up
 function cleanExpiredCodes() {
   const now = Date.now();
   for (const code in usedCodes) {
@@ -31,52 +38,51 @@ function cleanExpiredCodes() {
       delete usedCodes[code];
     }
   }
-  saveUsersData(usedCodes); // Keep file clean too
 }
 
+// Middleware to clean up expired codes every minute
 setInterval(cleanExpiredCodes, 60000);
 
-app.use(cookieParser());
-app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true }));
-
-// POST code entry
+// Handle code input
 app.post("/", (req, res) => {
-  const code = req.body.code?.trim();
+  const code = req.body.code;
 
-  if (!code) {
-    return res.status(400).send(`<script>alert("Please enter a code."); window.location.href="/";</script>`);
-  }
-
+  // Special bypass code: "goobers"
   if (code === "goobers") {
-    // Just load the main page, no cookie
-    return res.sendFile(path.join(__dirname, "public", "index.html"));
+    // Redirect directly to Kahoot embed without setting any cookies
+    return res.redirect("/");
   }
 
+  // Validate the code
   if (!VALID_CODES.includes(code)) {
-    return res.status(400).send(`<script>alert("Invalid code."); window.location.href="/";</script>`);
+    return res.status(400).send("<h1>Invalid Code</h1>");
   }
 
-  const now = Date.now();
-  if (usedCodes[code] && usedCodes[code] > now) {
-    return res.status(400).send(`<script>alert("Code already used."); window.location.href="/";</script>`);
+  // Check if the code has already been used or expired
+  const expirationTime = usedCodes[code];
+  if (expirationTime && expirationTime > Date.now()) {
+    return res.status(400).send("<h1>This code has already been used or expired.</h1>");
   }
 
-  // Save code use for 1 hour
-  usedCodes[code] = now + 60 * 60 * 1000;
+  // Mark the code as used and set expiration time (1 hour from now)
+  usedCodes[code] = Date.now() + 60 * 60 * 1000;  // Expire in 1 hour
+
+  // Save the updated used codes to the users.js file
   saveUsersData(usedCodes);
 
-  // Set cookie for 1 hour
-  res.cookie("codeEntered", true, { maxAge: 60 * 60 * 1000 });
+  // Set the user session and send the page with the Kahoot embed
+  res.cookie("codeEntered", true, { maxAge: 60 * 60 * 1000 }); // Set cookie for 1 hour
   res.redirect("/");
 });
 
-// GET main page
 app.get("/", (req, res) => {
-  if (req.cookies.codeEntered) {
+  const codeEntered = req.cookies.codeEntered;
+
+  // If the user has entered a valid code or used the "goobers" bypass, show the Kahoot embed
+  if (codeEntered || req.query.bypass === "goobers") {
     return res.sendFile(path.join(__dirname, "public", "index.html"));
   } else {
-    return res.sendFile(path.join(__dirname, "public", "index.html")); // includes code input logic
+    return res.sendFile(path.join(__dirname, "public", "codeInput.html"));
   }
 });
 
