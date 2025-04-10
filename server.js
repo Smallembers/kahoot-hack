@@ -28,6 +28,7 @@ function saveUsers(userSet) {
 
 // Serve the enter-code page with the 7-digit code form
 app.get('/enter-code', (req, res) => {
+  console.log('Serving enter-code page'); // Debugging log
   res.send(`
     <html>
       <head>
@@ -93,6 +94,7 @@ app.get('/enter-code', (req, res) => {
 
 // Handle 7-digit code submission
 app.post('/enter-code', (req, res) => {
+  console.log('Received code:', req.body.code); // Debugging log
   const { code } = req.body;
   const validCodes = [
     "2384751",
@@ -109,6 +111,7 @@ app.post('/enter-code', (req, res) => {
 
   if (validCodes.includes(code)) {
     const userId = uuidv4();
+    console.log('Setting cookie with UUID:', userId); // Debugging log
     res.cookie('uuid', userId, { maxAge: 1000 * 60 * 60 * 24 * 30, httpOnly: true }); // 30 days
     return res.redirect('/'); // Redirect to Kahoot embed page after valid code
   } else {
@@ -119,7 +122,10 @@ app.post('/enter-code', (req, res) => {
 // Serve the Kahoot embed page only after successful code entry
 app.get('/', (req, res) => {
   const userId = req.cookies.uuid;
+  console.log('User UUID:', userId); // Debugging log
+  
   if (!userId) {
+    console.log('No UUID found, redirecting to enter-code'); // Debugging log
     return res.redirect('/enter-code'); // Redirect to enter code if user doesn't have uuid
   }
 
