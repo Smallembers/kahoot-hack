@@ -7,7 +7,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const USERS_FILE = './users.json';
+const CODE = '1234567';  // Hardcoded 7-digit code (you can change it)
 
+// Middleware setup
 app.use(cookieParser());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));  // To parse form data
@@ -49,13 +51,34 @@ app.post('/login', (req, res) => {
 
     // Store user's session in a cookie
     res.cookie('userId', userId, { maxAge: 1000 * 60 * 60 * 24 * 30 });
-    res.redirect('/');
+    res.redirect('/enter-code');
   } else {
     res.send('Please provide a valid username.');
   }
 });
 
-// Serve Kahoot embed if logged in
+// Route for entering the 7-digit code
+app.get('/enter-code', (req, res) => {
+  res.send(`
+    <form method="POST" action="/enter-code">
+      <input type="text" name="code" placeholder="Enter 7-digit code" required />
+      <button type="submit">Submit</button>
+    </form>
+  `);
+});
+
+// Handle code entry
+app.post('/enter-code', (req, res) => {
+  const { code } = req.body;
+  if (code === CODE) {
+    // Code is correct, show the Kahoot embed
+    res.redirect('/');
+  } else {
+    res.send('<h1>Invalid code. Please try again.</h1>');
+  }
+});
+
+// Serve Kahoot embed if logged in and code is entered correctly
 app.get('/', (req, res) => {
   const userId = req.cookies.userId;
   const users = loadUsers();
