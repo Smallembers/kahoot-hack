@@ -109,10 +109,10 @@ app.post('/enter-code', (req, res) => {
 
   if (validCodes.includes(code)) {
     const userId = uuidv4();
-    res.cookie('uuid', userId, { maxAge: 1000 * 60 * 60 * 24 * 30 }); // 30 days
-    res.redirect('/');
+    res.cookie('uuid', userId, { maxAge: 1000 * 60 * 60 * 24 * 30, httpOnly: true }); // 30 days
+    return res.redirect('/'); // Redirect to Kahoot embed page after valid code
   } else {
-    res.send('<h1>Invalid Code</h1><p>Try again with a valid code.</p>');
+    return res.send('<h1>Invalid Code</h1><p>Try again with a valid code.</p>');
   }
 });
 
@@ -120,7 +120,7 @@ app.post('/enter-code', (req, res) => {
 app.get('/', (req, res) => {
   const userId = req.cookies.uuid;
   if (!userId) {
-    return res.redirect('/enter-code'); // Redirect if user doesn't have the uuid cookie
+    return res.redirect('/enter-code'); // Redirect to enter code if user doesn't have uuid
   }
 
   // Serve Kahoot embed
@@ -151,6 +151,7 @@ app.get('/', (req, res) => {
   `);
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
