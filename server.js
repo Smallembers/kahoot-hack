@@ -11,18 +11,18 @@ app.use(cookieParser());
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 
-// Load codes from file
+// Load codes from codes.json
 function loadCodes() {
   if (!fs.existsSync(CODES_FILE)) fs.writeFileSync(CODES_FILE, "[]");
   return new Set(JSON.parse(fs.readFileSync(CODES_FILE)));
 }
 
-// Save codes after removing used one
+// Save codes to codes.json
 function saveCodes(codes) {
   fs.writeFileSync(CODES_FILE, JSON.stringify(Array.from(codes)));
 }
 
-// Show code entry page
+// Show the code entry page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
@@ -32,17 +32,24 @@ app.post("/submit", (req, res) => {
   const code = req.body.code;
   const codes = loadCodes();
 
+  if (code === "goobers") {
+    // Special code that never expires
+    res.cookie("access", "granted", { maxAge: 1000 * 60 * 60 }); // 1 hour
+    return res.redirect("/kahoot");
+  }
+
   if (codes.has(code)) {
     codes.delete(code); // remove used code
     saveCodes(codes);
     res.cookie("access", "granted", { maxAge: 1000 * 60 * 60 }); // 1 hour
-    res.redirect("/kahoot");
-  } else {
-    res.send("<h2>❌ Invalid or used code</h2><a href='/'>Try again</a>");
+    return res.redirect("/kahoot");
   }
+
+  // Invalid or used code
+  res.send("<h2>❌ Invalid or used code</h2><a href='/'>Try again</a>");
 });
 
-// Protected route
+// Protected route: only visible if user has cookie
 app.get("/kahoot", (req, res) => {
   if (req.cookies.access === "granted") {
     res.send(`
