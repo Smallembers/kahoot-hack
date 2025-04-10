@@ -49,7 +49,8 @@ app.post("/", (req, res) => {
 
   // Special bypass code: "goobers"
   if (code === "goobers") {
-    // Redirect directly to Kahoot embed without setting any cookies
+    // Redirect directly to Kahoot embed and set the cookie for "goobers"
+    res.cookie("codeEntered", true, { maxAge: 60 * 60 * 1000 }); // Set cookie for 1 hour
     return res.redirect("/");
   }
 
@@ -79,9 +80,10 @@ app.get("/", (req, res) => {
   const codeEntered = req.cookies.codeEntered;
 
   // If the user has entered a valid code or used the "goobers" bypass, show the Kahoot embed
-  if (codeEntered || req.query.bypass === "goobers") {
+  if (codeEntered) {
     return res.sendFile(path.join(__dirname, "public", "index.html"));
   } else {
+    // If not, show the code input page
     return res.sendFile(path.join(__dirname, "public", "codeInput.html"));
   }
 });
