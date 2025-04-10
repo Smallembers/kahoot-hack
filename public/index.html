@@ -80,17 +80,21 @@
     .popup {
       display: none;
       position: absolute;
-      top: 10px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      padding: 15px 25px;
-      background-color: #7b2cbf;
-      color: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      font-size: 1.2rem;
+      padding: 1rem 2rem;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff;
+      font-weight: 500;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      font-size: 1.1rem;
       z-index: 9999;
-      animation: fadeInPopup 0.3s forwards;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      animation: fadeInPopup 0.3s ease forwards;
     }
 
     #kahootFrame {
@@ -163,7 +167,7 @@
       if (response.redirected || code === "goobers") {
         document.getElementById("login").style.display = "none";
         const iframe = document.getElementById("kahootFrame");
-        iframe.classList.add("show"); // triggers the slide-in animation
+        iframe.classList.add("show");
         iframe.style.display = "block";
       } else {
         showPopup();
