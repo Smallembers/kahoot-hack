@@ -47,6 +47,12 @@ setInterval(cleanExpiredCodes, 60000);
 app.post("/", (req, res) => {
   const code = req.body.code;
 
+  // Special bypass code: "goobers"
+  if (code === "goobers") {
+    // Redirect directly to Kahoot embed without setting any cookies
+    return res.redirect("/");
+  }
+
   // Validate the code
   if (!VALID_CODES.includes(code)) {
     return res.status(400).send("<h1>Invalid Code</h1>");
@@ -72,8 +78,8 @@ app.post("/", (req, res) => {
 app.get("/", (req, res) => {
   const codeEntered = req.cookies.codeEntered;
 
-  // Send the page that either shows the code input form or the Kahoot embed based on the cookie
-  if (codeEntered) {
+  // If the user has entered a valid code or used the "goobers" bypass, show the Kahoot embed
+  if (codeEntered || req.query.bypass === "goobers") {
     return res.sendFile(path.join(__dirname, "public", "index.html"));
   } else {
     return res.sendFile(path.join(__dirname, "public", "codeInput.html"));
