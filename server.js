@@ -125,7 +125,8 @@ app.get('/', (req, res) => {
   console.log('User UUID:', userId); // Debugging log
   
   if (!userId) {
-    console.log('No UUID found, redirecting to enter-code'); // Debugging log
+    // If no valid cookie exists, don't show the embed and redirect to the enter code page
+    console.log('No valid UUID cookie, redirecting to enter-code');
     return res.redirect('/enter-code'); // Redirect to enter code if user doesn't have uuid
   }
 
