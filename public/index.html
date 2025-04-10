@@ -82,12 +82,25 @@
       animation: fadeInPopup 0.3s forwards;
     }
 
+    .kahoot-container {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem 3rem;
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.7s ease-in-out;
+    }
+
     iframe {
-      width: 100vw; /* Full viewport width */
-      height: 100vh; /* Full viewport height */
+      width: 100%;
+      height: 100%;
       border: none;
-      border-radius: 0;
-      box-shadow: none;
+      border-radius: 12px;
     }
 
     @keyframes gradientAnimation {
@@ -118,7 +131,7 @@
     </form>
   </div>
 
-  <div class="container" id="kahoot" style="display: none;">
+  <div class="kahoot-container" id="kahoot">
     <iframe id="kahootIframe" src="https://kahoot.club/" allowfullscreen></iframe>
   </div>
 
@@ -146,10 +159,7 @@
       if (response.redirected || code === "goobers") {
         // valid code or 'goobers' used, show embed
         document.getElementById("login").style.display = "none";
-        document.getElementById("kahoot").style.display = "block";
-        
-        // Set the iframe source to kahoot.club for fullscreen
-        document.getElementById("kahootIframe").src = "https://kahoot.club/";
+        document.getElementById("kahoot").style.display = "flex";  // changed to 'flex' for proper centering
       } else {
         showPopup();
       }
