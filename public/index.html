@@ -1,32 +1,63 @@
-<style>
-  .popup {
-    display: none;
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 1rem 2rem;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #fff;
-    font-weight: 500;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    font-size: 1.1rem;
-    z-index: 9999;
-    animation: fadeInPopup 0.3s ease forwards;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kahoot Access</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #7b2cbf, #c9184a);
+      background-size: 400% 400%;
+      animation: gradientAnimation 6s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+    }
 
-  @keyframes fadeInPopup {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -20px);
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem 3rem;
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      animation: fadeIn 0.7s ease-in-out;
+      z-index: 1;
     }
-    100% {
-      opacity: 1;
-      transform: translate(-50%, 0);
+
+    h1 {
+      margin-bottom: 1rem;
+      color: #7b2cbf;
+      font-size: 1.8rem;
+      font-weight: bold;
     }
-  }
-</style>
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      font-size: 1.2rem;
+      border: 2px solid #c9184a;
+      border-radius: 12px;
+      outline: none;
+      margin-bottom: 1.5rem;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(6px);
+    }
+
+    input[type="text"]:focus {
+      border-color: #7b2cbf;
+    }
+
+    button {
+      background-color: #c9184a;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size:
