@@ -22,18 +22,20 @@ function saveCodes(codes) {
   fs.writeFileSync(CODES_FILE, JSON.stringify(Array.from(codes)));
 }
 
-// Show the code entry page
+// Home route — shows code input unless already logged in
 app.get("/", (req, res) => {
+  if (req.cookies.access === "granted") {
+    return res.redirect("/kahoot");
+  }
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-// Handle code submission
+// Handle submitted code
 app.post("/submit", (req, res) => {
   const code = req.body.code;
   const codes = loadCodes();
 
   if (code === "goobers") {
-    // Special code that never expires
     res.cookie("access", "granted", { maxAge: 1000 * 60 * 60 }); // 1 hour
     return res.redirect("/kahoot");
   }
@@ -45,11 +47,10 @@ app.post("/submit", (req, res) => {
     return res.redirect("/kahoot");
   }
 
-  // Invalid or used code
   res.send("<h2>❌ Invalid or used code</h2><a href='/'>Try again</a>");
 });
 
-// Protected route: only visible if user has cookie
+// Protected Kahoot embed route
 app.get("/kahoot", (req, res) => {
   if (req.cookies.access === "granted") {
     res.send(`
