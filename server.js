@@ -49,7 +49,7 @@ app.post("/", (req, res) => {
 
   // Special bypass code: "goobers"
   if (code === "goobers") {
-    // Redirect directly to Kahoot embed and set the cookie for "goobers"
+    // Set cookie and return success response
     res.cookie("codeEntered", true, { maxAge: 60 * 60 * 1000 }); // Set cookie for 1 hour
     return res.redirect("/");
   }
