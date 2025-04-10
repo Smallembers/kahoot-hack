@@ -120,7 +120,7 @@
 
     #kahootFrame.loading {
       display: block;
-      animation: iframeLoading 2s ease-in-out infinite;
+      animation: iframeFadeIn 2s ease-in-out forwards;
     }
 
     @keyframes gradientAnimation {
@@ -139,10 +139,9 @@
       100% { opacity: 1; top: 40px; }
     }
 
-    @keyframes iframeLoading {
-      0% { transform: scale(0.8); opacity: 0.5; }
-      50% { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
+    @keyframes iframeFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
@@ -184,7 +183,7 @@
         document.getElementById("login").style.display = "none";
         const iframe = document.getElementById("kahootFrame");
         iframe.classList.remove("loading");
-        iframe.classList.add("show"); // triggers the slide-in and fade-in animation
+        iframe.classList.add("show");
         iframe.style.display = "block";
       } else {
         showPopup();
