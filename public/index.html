@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kahoot Embed</title>
   <style>
     html, body {
@@ -16,9 +17,45 @@
       height: 100%;
       border: none;
     }
+
+    /* Style for the popup */
+    #popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 18px;
+      display: none;
+      z-index: 9999;
+    }
+
+    /* Animation for fading out the popup */
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
+  <!-- Popup message -->
+  <div id="popup">Welcome to Kahoot!</div>
+
+  <!-- Kahoot Embed -->
   <iframe src="https://kahoot.club" allowfullscreen></iframe>
+
+  <script>
+    // Show popup for 3 seconds and fade it out
+    window.onload = function() {
+      const popup = document.getElementById('popup');
+      popup.style.display = 'block';
+      setTimeout(() => {
+        popup.style.animation = 'fadeOut 1s forwards'; // Apply fade-out animation
+      }, 3000); // Show for 3 seconds
+    };
+  </script>
 </body>
 </html>
