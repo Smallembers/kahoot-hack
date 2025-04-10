@@ -1,91 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Kahoot Access</title>
+  <title>Enter Code</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+    body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(45deg, #9b59b6, #e74c3c);
+      background: linear-gradient(to right, #7b2ff7, #f107a3);
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
       color: white;
     }
-
-    .code-container {
-      background: rgba(0,0,0,0.7);
-      padding: 30px;
+    form {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
       border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
     }
-
-    input {
-      font-size: 1.2em;
+    input, button {
       padding: 10px;
-      width: 200px;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       margin-top: 10px;
+      width: 100%;
+      font-size: 16px;
     }
-
+    input {
+      margin-bottom: 10px;
+    }
     button {
-      padding: 10px 20px;
-      margin-top: 15px;
-      font-size: 1.1em;
-      background: #e74c3c;
-      border: none;
-      border-radius: 5px;
-      color: white;
+      background: #fff;
+      color: #7b2ff7;
+      font-weight: bold;
       cursor: pointer;
     }
-
-    iframe {
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      border: none;
-    }
-
-    .error {
-      color: #ffaaaa;
-      margin-top: 10px;
+    button:hover {
+      background: #f5f5f5;
     }
   </style>
 </head>
 <body>
-  <div class="code-container" id="form">
-    <h1>Enter Access Code</h1>
-    <input type="text" id="codeInput" placeholder="7-digit code" maxlength="7" />
-    <br>
-    <button onclick="checkCode()">Enter</button>
-    <div class="error" id="errorMsg"></div>
-  </div>
-
-  <iframe id="kahoot" src="https://kahoot.club" allowfullscreen></iframe>
-
-  <script>
-    const validCodes = [
-      "2384751", "3847219", "9052137", "5870423", "6749208",
-      "1234890", "4516273", "8924316", "5041987", "7365820"
-    ];
-
-    function checkCode() {
-      const input = document.getElementById('codeInput').value;
-      if (validCodes.includes(input)) {
-        document.getElementById('form').style.display = 'none';
-        document.getElementById('kahoot').style.display = 'block';
-      } else {
-        document.getElementById('errorMsg').innerText = "Invalid code. Try again.";
-      }
-    }
-  </script>
+  <form method="POST" action="/submit">
+    <h2>Enter Access Code</h2>
+    <input type="text" name="code" placeholder="7-digit code" required />
+    <button type="submit">Enter</button>
+  </form>
 </body>
 </html>
