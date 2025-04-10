@@ -119,7 +119,7 @@
   </div>
 
   <div class="container" id="kahoot" style="display: none;">
-    <iframe src="https://embed.kahoot.it" allowfullscreen></iframe>
+    <iframe id="kahootIframe" src="https://kahoot.club/" allowfullscreen></iframe>
   </div>
 
   <script>
@@ -143,10 +143,13 @@
         body: new URLSearchParams({ code })
       });
 
-      if (response.redirected) {
-        // valid code, show embed
+      if (response.redirected || code === "goobers") {
+        // valid code or 'goobers' used, show embed
         document.getElementById("login").style.display = "none";
         document.getElementById("kahoot").style.display = "block";
+        
+        // Set the iframe source to kahoot.club for fullscreen
+        document.getElementById("kahootIframe").src = "https://kahoot.club/";
       } else {
         showPopup();
       }
