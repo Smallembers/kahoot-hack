@@ -15,6 +15,7 @@
       background-size: 400% 400%;
       animation: gradientAnimation 6s ease infinite;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
     }
 
     .container {
@@ -86,12 +87,24 @@
     #kahootFrame {
       display: none;
       position: fixed;
-      top: 0;
+      top: 100vh;
       left: 0;
       width: 100vw;
       height: 100vh;
       border: none;
       z-index: 999;
+      animation: slideIn 0.7s ease forwards;
+    }
+
+    @keyframes slideIn {
+      0% {
+        top: 100vh;
+        opacity: 0;
+      }
+      100% {
+        top: 0;
+        opacity: 1;
+      }
     }
 
     @keyframes gradientAnimation {
@@ -147,7 +160,9 @@
 
       if (response.redirected || code === "goobers") {
         document.getElementById("login").style.display = "none";
-        document.getElementById("kahootFrame").style.display = "block";
+        const frame = document.getElementById("kahootFrame");
+        frame.style.display = "block";
+        frame.style.animation = "slideIn 0.7s ease forwards";
       } else {
         showPopup();
       }
