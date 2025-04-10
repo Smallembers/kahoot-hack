@@ -11,45 +11,41 @@ const USERS_FILE = './users.json';
 app.use(cookieParser());
 app.use(express.static('public'));
 
-// Load or create users file
+// Load users from users.json
 function loadUsers() {
   if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, '[]');
+    fs.writeFileSync(USERS_FILE, JSON.stringify([]));
   }
-  return new Set(JSON.parse(fs.readFileSync(USERS_FILE)));
+  const data = fs.readFileSync(USERS_FILE);
+  return new Set(JSON.parse(data));
 }
 
+// Save users to users.json
 function saveUsers(userSet) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify([...userSet]));
+  fs.writeFileSync(USERS_FILE, JSON.stringify(Array.from(userSet)));
 }
-
-app.use((req, res, next) => {
-  let userId = req.cookies.userId;
-  let users = loadUsers();
-
-  if (!userId) {
-    userId = uuidv4();
-    res.cookie('userId', userId, { httpOnly: true });
-  }
-
-  if (!users.has(userId)) {
-    if (users.size >= 2) {
-      return res.status(403).send(`
-        <h1>Access Denied</h1>
-        <p>This website is limited to 2 unique users.</p>
-      `);
-    }
-    users.add(userId);
-    saveUsers(users);
-  }
-
-  next();
-});
 
 app.get('/', (req, res) => {
+  const userId = req.cookies.uuid;
+  let users = loadUsers();
+
+  if (userId && users.has(userId)) {
+    // Returning user
+    return res.sendFile(path.join(__dirname, 'public/index.html'));
+  }
+
+  if (users.size >= 2) {
+    return res.status(403).send('<h1>🚫 Access Denied</h1><p>This link is limited to 2 users only.</p>');
+  }
+
+  // New user
+  const newUuid = uuidv4();
+  res.cookie('uuid', newUuid, { maxAge: 1000 * 60 * 60 * 24 * 30 }); // Cookie lasts 30 days
+  users.add(newUuid);
+  saveUsers(users);
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
