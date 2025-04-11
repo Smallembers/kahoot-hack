@@ -1,152 +1,75 @@
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #4e72b7, #2d4a6f);
-    background-size: 400% 400%;
-    animation: gradientAnimation 6s ease infinite;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow: hidden;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exploit Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Exploit Hub</h1>
+    <div class="popup" id="popup">Access Granted</div>
+    
+    <!-- Timer Section -->
+    <div class="timer" id="timer">00:00</div>
 
-  .container {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    padding: 2rem 3rem;
-    border-radius: 15px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    max-width: 500px;
-    width: 100%;
-    animation: fadeIn 0.7s ease-in-out;
-    z-index: 1;
-  }
+    <button id="kahootBtn" onclick="startKahoot()">Go to Kahoot</button>
 
-  h1 {
-    margin-bottom: 1.5rem;
-    color: #d0e8f5;
-    font-size: 2rem;
-    font-weight: bold;
-    text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-  }
+    <!-- Hidden Kahoot Frame -->
+    <iframe id="kahootFrame" src="https://kahoot.it" frameborder="0"></iframe>
+  </div>
 
-  input[type="text"] {
-    width: 100%;
-    padding: 1rem 1.4rem;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 16px;
-    outline: none;
-    margin-bottom: 1.5rem;
-    box-sizing: border-box;
-    background: rgba(255, 255, 255, 0.25);
-    color: #fff;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    transition: all 0.3s ease;
-  }
+  <script>
+    let timer;
+    let seconds = 0;
+    let isInfinite = false; // Flag to track if it's an infinite timer session
+    let timerInterval;
 
-  input[type="text"]::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-  }
+    // Function to update the timer
+    function updateTimer() {
+      if (!isInfinite) {
+        if (seconds <= 0) {
+          clearInterval(timerInterval);
+          return;
+        }
+        seconds--;
+      }
 
-  input[type="text"]:focus {
-    background: rgba(255, 255, 255, 0.35);
-    box-shadow: 0 0 0 3px rgba(70, 150, 230, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3);
-  }
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      document.getElementById("timer").textContent = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
 
-  button {
-    background-color: #3182b8;
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    font-size: 1.2rem;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
+    // Start the timer countdown
+    function startTimer(duration) {
+      seconds = duration;
+      timerInterval = setInterval(updateTimer, 1000);
+    }
 
-  button:hover {
-    background-color: #2671a0;
-  }
+    // Bypass timer if "goobers" code is used
+    function startKahoot() {
+      if (document.cookie.includes("goobers")) {
+        isInfinite = true;
+        seconds = 9999; // Keep the timer at 99:99 indefinitely
+      } else {
+        isInfinite = false;
+        startTimer(60 * 60); // Start 1 hour timer
+      }
 
-  .popup {
-    display: none;
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 1rem 2rem;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #fff;
-    font-weight: 500;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    font-size: 1.1rem;
-    z-index: 9999;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    animation: fadeInPopup 0.3s ease forwards;
-  }
+      // Show Kahoot iframe and hide the menu
+      document.getElementById("kahootFrame").classList.add("show");
+      document.getElementById("kahootBtn").style.display = 'none';
+      document.getElementById("popup").style.display = 'none';
+    }
 
-  #kahootFrame {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 100vw;
-    width: 100vw;
-    height: 100vh;
-    border: none;
-    z-index: 999;
-    transition: left 1s ease, opacity 0.5s ease;
-    opacity: 0;
-  }
+    // Simulate a "code entered" state (for testing or after a real check)
+    function codeEntered() {
+      startKahoot();
+      document.getElementById("popup").style.display = 'block';
+    }
 
-  #kahootFrame.show {
-    left: 0;
-    opacity: 1;
-  }
-
-  #kahootFrame.loading {
-    display: block;
-    animation: iframeFadeIn 2s ease-in-out forwards;
-  }
-
-  @keyframes gradientAnimation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeInPopup {
-    0% { opacity: 0; top: 10px; }
-    100% { opacity: 1; top: 40px; }
-  }
-
-  @keyframes iframeFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  .timer {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 2rem;
-    color: #d0e8f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-
-</style>
+    // Initialize with code entering state
+    codeEntered();
+  </script>
+</body>
+</html>
