@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Enter Code</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #7b2cbf, #c9184a);
+      font-family: sans-serif;
+    }
+    .box {
+      background: rgba(255,255,255,0.1);
+      padding: 2rem;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+    input, button {
+      padding: 0.8rem;
+      font-size: 1rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Enter Access Code</h2>
+    <form method="POST" action="/">
+      <input type="text" name="code" placeholder="7-digit code" required />
+      <br />
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</body>
+</html>
