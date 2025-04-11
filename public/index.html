@@ -1,177 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Exploit Hub</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #7b2cbf, #c9184a);
-      background-size: 400% 400%;
-      animation: gradientAnimation 6s ease infinite;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4e72b7, #2d4a6f);
+    background-size: 400% 400%;
+    animation: gradientAnimation 6s ease infinite;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+  }
 
-    .container, .menu {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      padding: 2rem 3rem;
-      border-radius: 15px;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      max-width: 500px;
-      width: 100%;
-      animation: fadeIn 0.7s ease-in-out;
-    }
+  .container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 2rem 3rem;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    animation: fadeIn 0.7s ease-in-out;
+    z-index: 1;
+  }
 
-    h1, .animated-title {
-      color: #fff;
-      font-size: 2rem;
-      font-weight: bold;
-      text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    }
+  h1 {
+    margin-bottom: 1.5rem;
+    color: #d0e8f5;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  }
 
-    .animated-title {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      animation: slideIn 1s ease-in-out forwards;
-      display: none;
-    }
+  input[type="text"] {
+    width: 100%;
+    padding: 1rem 1.4rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 16px;
+    outline: none;
+    margin-bottom: 1.5rem;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+  }
 
-    .menu {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-    }
+  input[type="text"]::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
 
-    #timer {
-      position: fixed;
-      top: 10px;
-      right: 20px;
-      font-size: 1.5rem;
-      color: white;
-      font-weight: bold;
-    }
+  input[type="text"]:focus {
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 0 0 3px rgba(70, 150, 230, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
 
-    input[type="text"] {
-      width: 100%;
-      padding: 1rem 1.4rem;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 16px;
-      outline: none;
-      margin-bottom: 1.5rem;
-      background: rgba(255, 255, 255, 0.25);
-      color: #fff;
-    }
+  button {
+    background-color: #3182b8;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.2rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
 
-    button {
-      background-color: #c9184a;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      font-size: 1.2rem;
-      border-radius: 12px;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
+  button:hover {
+    background-color: #2671a0;
+  }
 
-    iframe {
-      display: none;
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 999;
-    }
+  .popup {
+    display: none;
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #fff;
+    font-weight: 500;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    font-size: 1.1rem;
+    z-index: 9999;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    animation: fadeInPopup 0.3s ease forwards;
+  }
 
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+  #kahootFrame {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 100vw;
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    z-index: 999;
+    transition: left 1s ease, opacity 0.5s ease;
+    opacity: 0;
+  }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+  #kahootFrame.show {
+    left: 0;
+    opacity: 1;
+  }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-50px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body>
-  <div id="timer"></div>
+  #kahootFrame.loading {
+    display: block;
+    animation: iframeFadeIn 2s ease-in-out forwards;
+  }
 
-  <div class="container" id="login">
-    <h1>Enter Access Code</h1>
-    <form id="codeForm">
-      <input type="text" id="codeInput" placeholder="Enter code" required />
-      <button type="submit">Submit</button>
-    </form>
-  </div>
+  @keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 
-  <div class="menu" id="menu">
-    <div class="animated-title" id="animatedTitle">Exploit Hub</div>
-    <button onclick="openKahoot()">Open Kahoot</button>
-  </div>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-  <iframe id="kahootFrame" src="https://kahoot.club/" allowfullscreen></iframe>
+  @keyframes fadeInPopup {
+    0% { opacity: 0; top: 10px; }
+    100% { opacity: 1; top: 40px; }
+  }
 
-  <script>
-    document.getElementById("codeForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const code = document.getElementById("codeInput").value;
+  @keyframes iframeFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
-      const response = await fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ code })
-      });
+  .timer {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2rem;
+    color: #d0e8f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
 
-      if (response.redirected || code === "goobers") {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("menu").style.display = "flex";
-        document.getElementById("animatedTitle").style.display = "block";
-
-        const isInfinite = code === "goobers";
-        startTimer(isInfinite);
-      } else {
-        alert("Invalid code.");
-      }
-    });
-
-    function openKahoot() {
-      document.getElementById("kahootFrame").style.display = "block";
-    }
-
-    function startTimer(infinite = false) {
-      const timerEl = document.getElementById("timer");
-      if (infinite) {
-        timerEl.textContent = "99:99";
-        return;
-      }
-
-      let time = 60 * 60; // 1 hour in seconds
-      const interval = setInterval(() => {
-        const minutes = String(Math.floor(time / 60)).padStart(2, '0');
-        const seconds = String(time % 60).padStart(2, '0');
-        timerEl.textContent = `${minutes}:${seconds}`;
-        time--;
-
-        if (time < 0) clearInterval(interval);
-      }, 1000);
-    }
-  </script>
-</body>
-</html>
+</style>
