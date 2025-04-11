@@ -33,10 +33,15 @@ let usedCodes = loadUsersData();
 // Check for expired codes and clean up
 function cleanExpiredCodes() {
   const now = Date.now();
+  let modified = false;
   for (const code in usedCodes) {
     if (usedCodes[code] < now) {
       delete usedCodes[code];
+      modified = true; // Mark if any code was removed
     }
+  }
+  if (modified) {
+    saveUsersData(usedCodes); // Save only if changes were made
   }
 }
 
@@ -49,9 +54,8 @@ app.post("/", (req, res) => {
 
   // Special bypass code: "goobers"
   if (code === "goobers") {
-    // Set cookie and return success response
-    res.cookie("codeEntered", true, { maxAge: 60 * 60 * 1000 }); // Set cookie for 1 hour
-    return res.redirect("/");
+    // Directly show Kahoot embed for "goobers" without setting a cookie
+    return res.sendFile(path.join(__dirname, "public", "index.html"));
   }
 
   // Validate the code
