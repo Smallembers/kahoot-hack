@@ -36,71 +36,71 @@ setInterval(cleanExpiredCodes, 60000);
 
 app.post("/", (req, res) => {
   const code = req.body.code;
+  const now = Date.now();
 
   if (code === "goobers") {
-    res.cookie("codeEntered", true);
     res.cookie("codeUsed", "goobers");
-    return res.redirect("/");
+    return res.redirect("/menu.html");
   }
 
   if (!VALID_CODES.includes(code)) {
     return res.status(400).send("<h1>Invalid Code</h1>");
   }
 
-  const expirationTime = usedCodes[code];
-  if (expirationTime && expirationTime > Date.now()) {
+  // Start timer on first use
+  if (!usedCodes[code]) {
+    usedCodes[code] = now + 60 * 60 * 1000;
+    saveUsersData(usedCodes);
+  }
+
+  // Code expired
+  if (usedCodes[code] < now) {
     return res.status(400).send("<h1>This code has already been used or expired.</h1>");
   }
 
-  usedCodes[code] = Date.now() + 60 * 60 * 1000;
-  saveUsersData(usedCodes);
+  // Still valid
+  res.cookie("codeUsed", code);
+  res.redirect("/menu.html");
+});
 
-  res.cookie("codeEntered", true, { maxAge: 60 * 60 * 1000 });
-  res.cookie("codeUsed", code, { maxAge: 60 * 60 * 1000 });
-  res.redirect("/");
+app.get("/menu.html", (req, res, next) => {
+  const code = req.cookies.codeUsed;
+
+  if (!code) return res.redirect("/");
+
+  if (code === "goobers") {
+    const menuPath = path.join(__dirname, "public", "menu.html");
+    return fs.readFile(menuPath, "utf8", (err, html) => {
+      if (err) return next(err);
+      const injected = html.replace(
+        "</head>",
+        `<script>window.SERVER_TIME_LEFT = "infinite";</script>\n</head>`
+      );
+      res.send(injected);
+    });
+  }
+
+  const expiration = usedCodes[code];
+  const now = Date.now();
+
+  if (!expiration || expiration < now) {
+    return res.redirect("/");
+  }
+
+  const timeLeft = expiration - now;
+  const menuPath = path.join(__dirname, "public", "menu.html");
+
+  fs.readFile(menuPath, "utf8", (err, html) => {
+    if (err) return next(err);
+    const injected = html.replace(
+      "</head>",
+      `<script>window.SERVER_TIME_LEFT = ${timeLeft};</script>\n</head>`
+    );
+    res.send(injected);
+  });
 });
 
 app.get("/", (req, res) => {
-  const codeEntered = req.cookies.codeEntered;
-  const codeUsed = req.cookies.codeUsed;
-
-  if (codeEntered) {
-    let timeLeft = null;
-
-    if (codeUsed === "goobers") {
-      timeLeft = "infinite";
-    } else if (usedCodes[codeUsed]) {
-      timeLeft = Math.max(0, usedCodes[codeUsed] - Date.now());
-    }
-
-    return res.send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Menu</title>
-        <style>
-          body { font-family: sans-serif; margin: 0; padding: 0; background: #282c34; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-          #menu { text-align: center; }
-          #timer { position: fixed; top: 15px; right: 20px; font-size: 1.5rem; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 8px; }
-          iframe { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 999; }
-        </style>
-        <script>
-          window.SERVER_TIME_LEFT = ${JSON.stringify(timeLeft)};
-        </script>
-        <script src="/menu.js" defer></script>
-      </head>
-      <body>
-        <div id="timer">Loading...</div>
-        <div id="menu">
-          <h1>Access Granted</h1>
-          <button onclick="openKahoot()">Open Kahoot</button>
-        </div>
-        <iframe id="kahootFrame" src="https://kahoot.club/"></iframe>
-      </body>
-      </html>
-    `);
-  }
-
   res.sendFile(path.join(__dirname, "public", "codeInput.html"));
 });
 
