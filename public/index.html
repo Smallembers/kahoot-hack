@@ -17,7 +17,7 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .container {
+    .container, .menu {
       background: rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -28,15 +28,35 @@
       max-width: 500px;
       width: 100%;
       animation: fadeIn 0.7s ease-in-out;
-      z-index: 1;
     }
 
-    h1 {
-      margin-bottom: 1.5rem;
+    h1, .animated-title {
       color: #fff;
       font-size: 2rem;
       font-weight: bold;
       text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .animated-title {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      animation: slideIn 1s ease-in-out forwards;
+      display: none;
+    }
+
+    .menu {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #timer {
+      position: fixed;
+      top: 10px;
+      right: 20px;
+      font-size: 1.5rem;
+      color: white;
+      font-weight: bold;
     }
 
     input[type="text"] {
@@ -47,22 +67,8 @@
       border-radius: 16px;
       outline: none;
       margin-bottom: 1.5rem;
-      box-sizing: border-box;
       background: rgba(255, 255, 255, 0.25);
       color: #fff;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      transition: all 0.3s ease;
-    }
-
-    input[type="text"]::placeholder {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    input[type="text"]:focus {
-      background: rgba(255, 255, 255, 0.35);
-      box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     button {
@@ -73,37 +79,99 @@
       font-size: 1.2rem;
       border-radius: 12px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      margin-top: 1rem;
     }
 
-    button:hover {
-      background-color: #a2133b;
-    }
-
-    .popup {
+    iframe {
       display: none;
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 1rem 2rem;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: #fff;
-      font-weight: 500;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-      font-size: 1.1rem;
-      z-index: 9999;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      animation: fadeInPopup 0.3s ease forwards;
-    }
-
-    #kahootFrame {
-      display: none;
+      width: 100vw;
+      height: 100vh;
+      border: none;
       position: fixed;
       top: 0;
-      left: 100vw;
-      width: 100vw;
-      height:
+      left: 0;
+      z-index: 999;
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="timer"></div>
+
+  <div class="container" id="login">
+    <h1>Enter Access Code</h1>
+    <form id="codeForm">
+      <input type="text" id="codeInput" placeholder="Enter code" required />
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <div class="menu" id="menu">
+    <div class="animated-title" id="animatedTitle">Exploit Hub</div>
+    <button onclick="openKahoot()">Open Kahoot</button>
+  </div>
+
+  <iframe id="kahootFrame" src="https://kahoot.club/" allowfullscreen></iframe>
+
+  <script>
+    document.getElementById("codeForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const code = document.getElementById("codeInput").value;
+
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ code })
+      });
+
+      if (response.redirected || code === "goobers") {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("menu").style.display = "flex";
+        document.getElementById("animatedTitle").style.display = "block";
+
+        const isInfinite = code === "goobers";
+        startTimer(isInfinite);
+      } else {
+        alert("Invalid code.");
+      }
+    });
+
+    function openKahoot() {
+      document.getElementById("kahootFrame").style.display = "block";
+    }
+
+    function startTimer(infinite = false) {
+      const timerEl = document.getElementById("timer");
+      if (infinite) {
+        timerEl.textContent = "99:99";
+        return;
+      }
+
+      let time = 60 * 60; // 1 hour in seconds
+      const interval = setInterval(() => {
+        const minutes = String(Math.floor(time / 60)).padStart(2, '0');
+        const seconds = String(time % 60).padStart(2, '0');
+        timerEl.textContent = `${minutes}:${seconds}`;
+        time--;
+
+        if (time < 0) clearInterval(interval);
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
