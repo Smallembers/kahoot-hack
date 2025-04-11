@@ -6,15 +6,12 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Load valid codes from the codes.json file
 const VALID_CODES = JSON.parse(fs.readFileSync("codes.json", "utf8"));
 
-// Load and save users data from/to users.js
 function loadUsersData() {
   try {
     return JSON.parse(fs.readFileSync("users.js", "utf8"));
-  } catch (err) {
-    // If users.js doesn't exist or is empty, return an empty object
+  } catch {
     return {};
   }
 }
@@ -24,71 +21,87 @@ function saveUsersData(data) {
 }
 
 app.use(cookieParser());
-app.use(express.static('public'));
+app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 
-// Track used codes with expiration time
 let usedCodes = loadUsersData();
 
-// Check for expired codes and clean up
 function cleanExpiredCodes() {
   const now = Date.now();
   for (const code in usedCodes) {
-    if (usedCodes[code] < now) {
-      delete usedCodes[code];
-    }
+    if (usedCodes[code] < now) delete usedCodes[code];
   }
 }
-
-// Middleware to clean up expired codes every minute
 setInterval(cleanExpiredCodes, 60000);
 
-// Handle code input
 app.post("/", (req, res) => {
   const code = req.body.code;
 
-  // Special bypass code: "goobers"
   if (code === "goobers") {
-    // No cookies, just redirect to menu
-    return res.redirect("/menu");
+    res.cookie("codeEntered", true);
+    res.cookie("codeUsed", "goobers");
+    return res.redirect("/");
   }
 
-  // Validate the code
   if (!VALID_CODES.includes(code)) {
     return res.status(400).send("<h1>Invalid Code</h1>");
   }
 
-  // Check if the code has already been used or expired
   const expirationTime = usedCodes[code];
   if (expirationTime && expirationTime > Date.now()) {
     return res.status(400).send("<h1>This code has already been used or expired.</h1>");
   }
 
-  // Mark the code as used and set expiration time (1 hour from now)
-  usedCodes[code] = Date.now() + 60 * 60 * 1000;  // Expire in 1 hour
-
-  // Save the updated used codes to the users.js file
+  usedCodes[code] = Date.now() + 60 * 60 * 1000;
   saveUsersData(usedCodes);
 
-  // Redirect to the menu page
-  res.redirect("/menu");
+  res.cookie("codeEntered", true, { maxAge: 60 * 60 * 1000 });
+  res.cookie("codeUsed", code, { maxAge: 60 * 60 * 1000 });
+  res.redirect("/");
 });
 
 app.get("/", (req, res) => {
   const codeEntered = req.cookies.codeEntered;
+  const codeUsed = req.cookies.codeUsed;
 
-  // If the user has entered a valid code or used the "goobers" bypass, show the Kahoot embed
   if (codeEntered) {
-    return res.sendFile(path.join(__dirname, "public", "index.html"));
-  } else {
-    // If not, show the code input page
-    return res.sendFile(path.join(__dirname, "public", "codeInput.html"));
-  }
-});
+    let timeLeft = null;
 
-// Handle menu page (for after entering a valid code or special code)
-app.get("/menu", (req, res) => {
-  return res.sendFile(path.join(__dirname, "public", "menu.html"));
+    if (codeUsed === "goobers") {
+      timeLeft = "infinite";
+    } else if (usedCodes[codeUsed]) {
+      timeLeft = Math.max(0, usedCodes[codeUsed] - Date.now());
+    }
+
+    return res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Menu</title>
+        <style>
+          body { font-family: sans-serif; margin: 0; padding: 0; background: #282c34; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+          #menu { text-align: center; }
+          #timer { position: fixed; top: 15px; right: 20px; font-size: 1.5rem; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 8px; }
+          iframe { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; border: none; z-index: 999; }
+        </style>
+        <script>
+          window.SERVER_TIME_LEFT = ${JSON.stringify(timeLeft)};
+        </script>
+        <script src="/menu.js" defer></script>
+      </head>
+      <body>
+        <div id="timer">Loading...</div>
+        <div id="menu">
+          <h1>Access Granted</h1>
+          <button onclick="openKahoot()">Open Kahoot</button>
+        </div>
+        <iframe id="kahootFrame" src="https://kahoot.club/"></iframe>
+      </body>
+      </html>
+    `);
+  }
+
+  res.sendFile(path.join(__dirname, "public", "codeInput.html"));
 });
 
 app.listen(PORT, () => {
