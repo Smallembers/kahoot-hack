@@ -49,8 +49,8 @@ app.post("/", (req, res) => {
 
   // Special bypass code: "goobers"
   if (code === "goobers") {
-    // Don't set cookie for "goobers" bypass, just redirect to menu
-    return res.redirect("/");
+    // No cookies, just redirect to menu
+    return res.redirect("/menu");
   }
 
   // Validate the code
@@ -70,9 +70,8 @@ app.post("/", (req, res) => {
   // Save the updated used codes to the users.js file
   saveUsersData(usedCodes);
 
-  // Set the user session and send the page with the Kahoot embed
-  res.cookie("codeEntered", true, { maxAge: 60 * 60 * 1000 }); // Set cookie for 1 hour
-  res.redirect("/");
+  // Redirect to the menu page
+  res.redirect("/menu");
 });
 
 app.get("/", (req, res) => {
@@ -85,6 +84,11 @@ app.get("/", (req, res) => {
     // If not, show the code input page
     return res.sendFile(path.join(__dirname, "public", "codeInput.html"));
   }
+});
+
+// Handle menu page (for after entering a valid code or special code)
+app.get("/menu", (req, res) => {
+  return res.sendFile(path.join(__dirname, "public", "menu.html"));
 });
 
 app.listen(PORT, () => {
