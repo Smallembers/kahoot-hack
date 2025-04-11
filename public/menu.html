@@ -1,21 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Exploit Hub</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="menu.js" defer></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: linear-gradient(135deg, #7b2cbf, #c9184a);
+      background-size: 400% 400%;
+      animation: gradientAnimation 6s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem 3rem;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1s ease-in-out;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 15px #000;
+    }
+
+    .timer {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      background: rgba(255,255,255,0.15);
+      padding: 0.4rem 1rem;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .menu button {
+      background-color: #c9184a;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.2rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .menu button:hover {
+      background-color: #a2133b;
+    }
+
+    #kahootFrame {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      z-index: 999;
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #animatedTitle {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 10px #0ff;
+      margin-bottom: 2rem;
+      animation: titleFadeIn 2s ease-in-out;
+    }
+
+    @keyframes titleFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+        text-shadow: 0 0 0px #0ff;
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+        text-shadow: 0 0 15px #0ff, 0 0 25px #0ff, 0 0 35px #0ff;
+      }
+    }
+  </style>
+  <script src="/menu.js" defer></script>
+  <script>
+    window.SERVER_TIME_LEFT = window.SERVER_TIME_LEFT || "infinite";
+  </script>
 </head>
 <body>
+  <div id="animatedTitle">EXPLOIT HUB</div>
+
   <div class="container">
-    <h1>Welcome to Exploit Hub</h1>
+    <h1>Welcome</h1>
     <div class="timer" id="timer">60:00</div>
     <div class="menu">
-      <button id="kahootBtn">Kahoot</button>
+      <button id="kahootBtn" onclick="openKahoot()">Open Kahoot</button>
     </div>
   </div>
 
-  <iframe id="kahootFrame" class="kahoot-frame" src="https://kahoot.it"></iframe>
+  <iframe id="kahootFrame" src="https://kahoot.it" allowfullscreen></iframe>
 </body>
 </html>
